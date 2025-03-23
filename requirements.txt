@@ -1,4 +1,0 @@
-streamlit
-nltk
-scikit-learn #if you are using scikit-learn
-pandas #if you are using pandas
