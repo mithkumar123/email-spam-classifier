@@ -5,8 +5,12 @@ import nltk
 import streamlit as st
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
-nltk.download('punkt') #Example, download the punkt dataset.
+# ... rest of your code ...
 #Download other datasets as needed.
 # Load the saved vectorizer and model
 tfidf = pickle.load(open('vectorizer (1).pkl', 'rb'))
