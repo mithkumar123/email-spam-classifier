@@ -1,0 +1,150 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">streamlit </span><span class="s0">as </span><span class="s1">st</span>
+<span class="s0">import </span><span class="s1">pickle</span>
+<span class="s0">import </span><span class="s1">string</span>
+<span class="s0">import </span><span class="s1">nltk</span>
+<span class="s0">from </span><span class="s1">nltk</span><span class="s2">.</span><span class="s1">corpus </span><span class="s0">import </span><span class="s1">stopwords</span>
+<span class="s0">from </span><span class="s1">nltk</span><span class="s2">.</span><span class="s1">stem</span><span class="s2">.</span><span class="s1">porter </span><span class="s0">import </span><span class="s1">PorterStemmer</span>
+<span class="s0">from </span><span class="s1">sklearn</span><span class="s2">.</span><span class="s1">feature_extraction</span><span class="s2">.</span><span class="s1">text </span><span class="s0">import </span><span class="s1">TfidfVectorizer</span>
+
+<span class="s3"># Load the saved vectorizer and model</span>
+<span class="s1">tfidf </span><span class="s2">= </span><span class="s1">pickle</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s1">open</span><span class="s2">(</span><span class="s4">'vectorizer (1).pkl'</span><span class="s2">, </span><span class="s4">'rb'</span><span class="s2">))</span>
+<span class="s1">model </span><span class="s2">= </span><span class="s1">pickle</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s1">open</span><span class="s2">(</span><span class="s4">'model (1).pkl'</span><span class="s2">, </span><span class="s4">'rb'</span><span class="s2">))</span>
+
+<span class="s1">ps </span><span class="s2">= </span><span class="s1">PorterStemmer</span><span class="s2">()</span>
+
+<span class="s3"># Function to preprocess the text</span>
+<span class="s0">def </span><span class="s1">transform_text</span><span class="s2">(</span><span class="s1">text</span><span class="s2">):</span>
+    <span class="s1">text </span><span class="s2">= </span><span class="s1">text</span><span class="s2">.</span><span class="s1">lower</span><span class="s2">()</span>
+    <span class="s1">text </span><span class="s2">= </span><span class="s1">nltk</span><span class="s2">.</span><span class="s1">word_tokenize</span><span class="s2">(</span><span class="s1">text</span><span class="s2">)</span>
+
+    <span class="s1">y </span><span class="s2">= []</span>
+    <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">text</span><span class="s2">:</span>
+        <span class="s0">if </span><span class="s1">i</span><span class="s2">.</span><span class="s1">isalnum</span><span class="s2">():</span>
+            <span class="s1">y</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">i</span><span class="s2">)</span>
+
+    <span class="s1">text </span><span class="s2">= </span><span class="s1">y</span><span class="s2">[:]</span>
+    <span class="s1">y</span><span class="s2">.</span><span class="s1">clear</span><span class="s2">()</span>
+
+    <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">text</span><span class="s2">:</span>
+        <span class="s0">if </span><span class="s1">i </span><span class="s0">not in </span><span class="s1">stopwords</span><span class="s2">.</span><span class="s1">words</span><span class="s2">(</span><span class="s4">'english'</span><span class="s2">) </span><span class="s0">and </span><span class="s1">i </span><span class="s0">not in </span><span class="s1">string</span><span class="s2">.</span><span class="s1">punctuation</span><span class="s2">:</span>
+            <span class="s1">y</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">i</span><span class="s2">)</span>
+
+    <span class="s1">text </span><span class="s2">= </span><span class="s1">y</span><span class="s2">[:]</span>
+    <span class="s1">y</span><span class="s2">.</span><span class="s1">clear</span><span class="s2">()</span>
+
+    <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">text</span><span class="s2">:</span>
+        <span class="s1">y</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">ps</span><span class="s2">.</span><span class="s1">stem</span><span class="s2">(</span><span class="s1">i</span><span class="s2">))</span>
+
+    <span class="s0">return </span><span class="s4">&quot; &quot;</span><span class="s2">.</span><span class="s1">join</span><span class="s2">(</span><span class="s1">y</span><span class="s2">)</span>
+
+
+<span class="s3"># Streamlit App UI Enhancements</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">set_page_config</span><span class="s2">(</span><span class="s1">page_title</span><span class="s2">=</span><span class="s4">&quot;Spam Classifier&quot;</span><span class="s2">, </span><span class="s1">page_icon</span><span class="s2">=</span><span class="s4">&quot;🚀&quot;</span><span class="s2">, </span><span class="s1">layout</span><span class="s2">=</span><span class="s4">&quot;wide&quot;</span><span class="s2">)</span>
+
+<span class="s3"># Custom Dark Mode Styling</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;&quot;&quot; 
+    &lt;style&gt; 
+    body { 
+        background: linear-gradient(to right, #0F2027, #203A43, #2C5364); 
+        font-family: 'Arial', sans-serif; 
+    } 
+    .main { 
+        background-color: #1E1E1E; 
+        padding: 30px; 
+        border-radius: 10px; 
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); 
+    } 
+    .stTextInput, .stTextArea { 
+        background-color: #333; 
+        color: white; 
+        border-radius: 5px; 
+        border: 2px solid #00FFFF; 
+    } 
+    .stButton&gt;button { 
+        background: linear-gradient(to right, #00C9FF, #92FE9D); 
+        color: black; 
+        font-weight: bold; 
+        border-radius: 5px; 
+        padding: 10px 20px; 
+    } 
+    .stButton&gt;button:hover { 
+        background: linear-gradient(to right, #11998E, #38EF7D); 
+        color: white; 
+    } 
+    .title-text { 
+        text-align: center; 
+        color: #00FFFF; 
+        font-size: 30px; 
+        font-weight: bold; 
+        margin-bottom: 20px; 
+    } 
+    .spam-text { 
+        color: #FF4C4C; 
+        text-align: center; 
+        font-size: 24px; 
+        font-weight: bold; 
+    } 
+    .not-spam-text { 
+        color: #00FF7F; 
+        text-align: center; 
+        font-size: 24px; 
+        font-weight: bold; 
+    } 
+    &lt;/style&gt; 
+    &quot;&quot;&quot;</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+<span class="s3"># Sidebar</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;🚀 About This App&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">info</span><span class="s2">(</span>
+    <span class="s4">&quot;This AI-powered *Email/SMS Spam Classifier* detects spam messages using &quot;</span>
+    <span class="s4">&quot;Natural Language Processing (NLP) and Machine Learning (ML). &quot;</span>
+    <span class="s4">&quot;Simply enter a message, and our model will predict if it's spam or not!&quot;</span>
+<span class="s2">)</span>
+
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;🔹 *Built With:*&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;- Python &amp; Streamlit&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;- Scikit-Learn (ML)&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;- NLTK (NLP Processing)&quot;</span><span class="s2">)</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">sidebar</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;🔹 *Model:* Trained on 5000 SMS dataset.&quot;</span><span class="s2">)</span>
+
+<span class="s3"># Main App</span>
+<span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;&lt;h1 class='title-text'&gt;🚀 Email/SMS Spam Classifier&lt;/h1&gt;&quot;</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+
+<span class="s1">input_sms </span><span class="s2">= </span><span class="s1">st</span><span class="s2">.</span><span class="s1">text_area</span><span class="s2">(</span><span class="s4">&quot;✍ Enter the message&quot;</span><span class="s2">, </span><span class="s1">placeholder</span><span class="s2">=</span><span class="s4">&quot;Type your message here...&quot;</span><span class="s2">)</span>
+
+<span class="s0">if </span><span class="s1">st</span><span class="s2">.</span><span class="s1">button</span><span class="s2">(</span><span class="s4">'🔍 Predict'</span><span class="s2">):</span>
+    <span class="s0">if </span><span class="s1">input_sms</span><span class="s2">.</span><span class="s1">strip</span><span class="s2">() == </span><span class="s4">&quot;&quot;</span><span class="s2">:</span>
+        <span class="s1">st</span><span class="s2">.</span><span class="s1">warning</span><span class="s2">(</span><span class="s4">&quot;⚠ Please enter a valid message!&quot;</span><span class="s2">)</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s3"># 1. Preprocess</span>
+        <span class="s1">transformed_sms </span><span class="s2">= </span><span class="s1">transform_text</span><span class="s2">(</span><span class="s1">input_sms</span><span class="s2">)</span>
+        <span class="s3"># 2. Vectorize</span>
+        <span class="s1">vector_input </span><span class="s2">= </span><span class="s1">tfidf</span><span class="s2">.</span><span class="s1">transform</span><span class="s2">([</span><span class="s1">transformed_sms</span><span class="s2">])</span>
+        <span class="s3"># 3. Predict</span>
+        <span class="s1">result </span><span class="s2">= </span><span class="s1">model</span><span class="s2">.</span><span class="s1">predict</span><span class="s2">(</span><span class="s1">vector_input</span><span class="s2">)[</span><span class="s5">0</span><span class="s2">]</span>
+        <span class="s3"># 4. Display</span>
+        <span class="s0">if </span><span class="s1">result </span><span class="s2">== </span><span class="s5">1</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;&lt;h2 class='spam-text'&gt;🚨 Spam Message! 🚨&lt;/h2&gt;&quot;</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+        <span class="s0">else</span><span class="s2">:</span>
+            <span class="s1">st</span><span class="s2">.</span><span class="s1">markdown</span><span class="s2">(</span><span class="s4">&quot;&lt;h2 class='not-spam-text'&gt;✅ Not Spam ✅&lt;/h2&gt;&quot;</span><span class="s2">, </span><span class="s1">unsafe_allow_html</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span></pre>
+</body>
+</html>
