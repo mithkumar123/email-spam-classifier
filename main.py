@@ -1,11 +1,14 @@
-import streamlit as st
 import pickle
 import string
+
 import nltk
+nltk.download('punkt')
+import streamlit as st
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
 
+nltk.download('punkt') #Example, download the punkt dataset.
+#Download other datasets as needed.
 # Load the saved vectorizer and model
 tfidf = pickle.load(open('vectorizer (1).pkl', 'rb'))
 model = pickle.load(open('model (1).pkl', 'rb'))
