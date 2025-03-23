@@ -2,7 +2,6 @@ import pickle
 import string
 
 import nltk
-nltk.download ()
 import streamlit as st
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
